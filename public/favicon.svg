@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="12" fill="#14171C"/>
+  <!-- stylized roof gable in red -->
+  <path d="M14 26 L32 12 L50 26" fill="none" stroke="#E52320" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- adp letters stylized -->
+  <text x="32" y="46" font-family="'Inter', sans-serif" font-weight="900" font-size="20" fill="#FFFFFF" text-anchor="middle" letter-spacing="-1">adp</text>
+  <rect x="22" y="52" width="20" height="3" rx="1.5" fill="#E52320"/>
+</svg>
