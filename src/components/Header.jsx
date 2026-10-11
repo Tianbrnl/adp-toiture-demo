@@ -8,15 +8,34 @@ export function Header({ activeSection, onNavigate, onOpenQuoteModal }) {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setScrolled(true)
-      } else {
-        setScrolled(false)
-      }
+      setScrolled(window.scrollY > 15)
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Lock body scroll when mobile menu is active
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [mobileMenuOpen])
+
+  // Handle ESC key for mobile drawer
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [mobileMenuOpen])
 
   const navItems = [
     { id: 'hero', label: 'Accueil' },
@@ -29,6 +48,15 @@ export function Header({ activeSection, onNavigate, onOpenQuoteModal }) {
   const handleNavClick = (id) => {
     onNavigate(id)
     setMobileMenuOpen(false)
+  }
+
+  const handleQuoteClick = () => {
+    setMobileMenuOpen(false)
+    if (onOpenQuoteModal) {
+      onOpenQuoteModal()
+    } else {
+      onNavigate('devis')
+    }
   }
 
   return (
@@ -67,20 +95,26 @@ export function Header({ activeSection, onNavigate, onOpenQuoteModal }) {
 
         {/* Header Actions */}
         <div className="header-actions">
-          {/* Phone call CTA */}
-          <a href="tel:0787609636" className="phone-cta" title="Appeler ADP Toiture SA">
-            <Phone size={17} className="phone-icon" />
+          {/* Phone call CTA: full on desktop, compact on phone */}
+          <a 
+            href="tel:0787609636" 
+            className="phone-cta" 
+            title="Appeler ADP Toiture SA au 078 760 96 36"
+            aria-label="Appeler ADP Toiture SA"
+          >
+            <Phone size={16} className="phone-icon" />
             <span className="phone-number">078 760 96 36</span>
           </a>
 
           {/* Quote Button */}
           <button
             type="button"
-            onClick={() => onNavigate('devis')}
+            onClick={handleQuoteClick}
             className="btn btn-primary header-quote-btn"
           >
-            <span>Demander un devis</span>
-            <ArrowRight size={16} className="btn-arrow" />
+            <span className="quote-btn-text-full">Demander un devis</span>
+            <span className="quote-btn-text-compact">Devis</span>
+            <ArrowRight size={15} className="btn-arrow" />
           </button>
 
           {/* Mobile hamburger button */}
@@ -88,17 +122,23 @@ export function Header({ activeSection, onNavigate, onOpenQuoteModal }) {
             type="button"
             className="mobile-menu-toggle"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+            aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu de navigation'}
             aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
       {/* Mobile Navigation Drawer */}
-      <div className={`mobile-nav-drawer ${mobileMenuOpen ? 'mobile-nav-open' : ''}`}>
-        <div className="mobile-nav-backdrop" onClick={() => setMobileMenuOpen(false)} />
+      <div 
+        className={`mobile-nav-drawer ${mobileMenuOpen ? 'mobile-nav-open' : ''}`}
+        aria-hidden={!mobileMenuOpen}
+      >
+        <div 
+          className="mobile-nav-backdrop" 
+          onClick={() => setMobileMenuOpen(false)} 
+        />
         <div className="mobile-nav-content">
           <div className="mobile-nav-top">
             <Logo />
@@ -106,26 +146,32 @@ export function Header({ activeSection, onNavigate, onOpenQuoteModal }) {
               type="button"
               className="mobile-close-btn"
               onClick={() => setMobileMenuOpen(false)}
-              aria-label="Fermer"
+              aria-label="Fermer le menu"
             >
-              <X size={24} />
+              <X size={22} />
             </button>
           </div>
 
-          <ul className="mobile-nav-links">
-            {navItems.map((item) => (
-              <li key={item.id}>
-                <button
-                  type="button"
-                  onClick={() => handleNavClick(item.id)}
-                  className={`mobile-nav-link ${activeSection === item.id ? 'active' : ''}`}
-                >
-                  {item.label}
-                  {activeSection === item.id && <span className="mobile-active-dot" />}
-                </button>
-              </li>
-            ))}
-          </ul>
+          <nav aria-label="Navigation mobile">
+            <ul className="mobile-nav-links">
+              {navItems.map((item) => (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick(item.id)}
+                    className={`mobile-nav-link ${activeSection === item.id ? 'active' : ''}`}
+                  >
+                    <span>{item.label}</span>
+                    {activeSection === item.id ? (
+                      <span className="mobile-active-dot" />
+                    ) : (
+                      <ArrowRight size={14} className="mobile-nav-arrow" />
+                    )}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
           <div className="mobile-nav-footer">
             <a href="tel:0787609636" className="mobile-phone-btn">
@@ -134,8 +180,8 @@ export function Header({ activeSection, onNavigate, onOpenQuoteModal }) {
             </a>
             <button
               type="button"
-              onClick={() => { handleNavClick('devis'); }}
-              className="btn btn-primary w-full"
+              onClick={handleQuoteClick}
+              className="btn btn-primary w-full mobile-cta-btn"
             >
               <span>Demander un devis</span>
               <ArrowRight size={16} />

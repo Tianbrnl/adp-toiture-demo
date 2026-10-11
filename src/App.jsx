@@ -9,21 +9,26 @@ import { Partners } from './components/Partners'
 import { QuoteForm } from './components/QuoteForm'
 import { Footer } from './components/Footer'
 import { Modal } from './components/Modal'
-import { ArrowRight, Check, MapPin, Phone, ShieldCheck, Wrench, Clock } from 'lucide-react'
+import { ArrowRight, Check, MapPin, Phone, ShieldCheck, Wrench, Clock, FileText } from 'lucide-react'
 
 export function App() {
   const [activeSection, setActiveSection] = useState('hero')
   const [selectedService, setSelectedService] = useState(null)
   const [selectedProject, setSelectedProject] = useState(null)
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false)
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false)
   const [legalModalType, setLegalModalType] = useState(null) // 'mentions' | 'privacy' | null
 
   // Smooth scroll handler
   const handleNavigate = (sectionId) => {
     setActiveSection(sectionId)
+    if (sectionId === 'devis') {
+      setIsQuoteModalOpen(true)
+      return
+    }
     const element = document.getElementById(sectionId)
     if (element) {
-      const headerOffset = 76
+      const headerOffset = 70
       const elementPosition = element.getBoundingClientRect().top
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset
 
@@ -36,7 +41,7 @@ export function App() {
 
   // Active section scroll spy
   useEffect(() => {
-    const sectionIds = ['hero', 'services', 'apropos', 'realisations', 'avis', 'devis', 'contact']
+    const sectionIds = ['hero', 'services', 'apropos', 'realisations', 'avis', 'contact']
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 120
       for (const id of sectionIds) {
@@ -56,12 +61,15 @@ export function App() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  const hasAnyModalOpen = !!(selectedService || selectedProject || isAboutModalOpen || isQuoteModalOpen || legalModalType)
+
   return (
-    <div className="app-layout">
+    <div className={`app-layout ${!hasAnyModalOpen ? 'has-mobile-bar' : ''}`}>
       {/* 1. Header */}
       <Header
         activeSection={activeSection}
         onNavigate={handleNavigate}
+        onOpenQuoteModal={() => setIsQuoteModalOpen(true)}
       />
 
       <main>
@@ -90,8 +98,6 @@ export function App() {
 
         {/* 7. Client Logos Section */}
         <Partners />
-
-
       </main>
 
       {/* 9. Footer */}
@@ -99,6 +105,42 @@ export function App() {
         onNavigate={handleNavigate}
         onOpenLegal={(type) => setLegalModalType(type)}
       />
+
+      {/* Mobile Sticky Quick Action Bar (visible on mobile only when no modal is open) */}
+      {!hasAnyModalOpen && (
+        <aside className="mobile-sticky-bar" aria-label="Actions rapides mobiles">
+          <a
+            href="tel:0787609636"
+            className="mobile-sticky-btn mobile-sticky-call"
+            aria-label="Appeler ADP Toiture SA"
+          >
+            <Phone size={17} />
+            <span>078 760 96 36</span>
+          </a>
+
+          <button
+            type="button"
+            onClick={() => setIsQuoteModalOpen(true)}
+            className="mobile-sticky-btn mobile-sticky-quote"
+            aria-label="Demander un devis gratuit"
+          >
+            <FileText size={17} />
+            <span>Devis gratuit</span>
+          </button>
+        </aside>
+      )}
+
+      {/* Interactive Quote Request Modal */}
+      <Modal
+        isOpen={isQuoteModalOpen}
+        onClose={() => setIsQuoteModalOpen(false)}
+        title="Demander un devis gratuit"
+      >
+        <QuoteForm 
+          isModal={true} 
+          onComplete={() => {}} 
+        />
+      </Modal>
 
       {/* Service Detail Modal */}
       <Modal
@@ -133,9 +175,9 @@ export function App() {
                   type="button"
                   onClick={() => {
                     setSelectedService(null)
-                    handleNavigate('devis')
+                    setIsQuoteModalOpen(true)
                   }}
-                  className="btn btn-primary"
+                  className="btn btn-primary w-full-mobile"
                 >
                   <span>Demander un devis pour ce service</span>
                   <ArrowRight size={16} />
@@ -182,9 +224,9 @@ export function App() {
                   type="button"
                   onClick={() => {
                     setSelectedProject(null)
-                    handleNavigate('devis')
+                    setIsQuoteModalOpen(true)
                   }}
-                  className="btn btn-primary"
+                  className="btn btn-primary w-full-mobile"
                 >
                   <span>Un projet similaire ? Demandez une offre</span>
                   <ArrowRight size={16} />
@@ -210,28 +252,28 @@ export function App() {
               <ShieldCheck size={22} className="text-red flex-shrink-0 mt-0.5" />
               <div>
                 <strong className="block text-gray-900 font-semibold text-sm">Garantie & Normes SIA</strong>
-                <span className="text-xs text-gray-500">Travaux exécutés dans le respect strict des normes de la Société suisse des ingénieurs et des architectes.</span>
+                <span className="text-xs text-gray-500">Travaux exécutés dans le respect strict des normes suisses de la construction.</span>
               </div>
             </div>
             <div className="p-3 bg-gray-50 rounded-lg border border-gray-100 flex items-start gap-3">
               <Wrench size={22} className="text-red flex-shrink-0 mt-0.5" />
               <div>
                 <strong className="block text-gray-900 font-semibold text-sm">Atelier de façonnage</strong>
-                <span className="text-xs text-gray-500">Fabrication sur mesure des éléments de ferblanterie en zinc, cuivre et aluminium directement sur place.</span>
+                <span className="text-xs text-gray-500">Fabrication sur mesure des éléments de ferblanterie en zinc, cuivre et aluminium.</span>
               </div>
             </div>
             <div className="p-3 bg-gray-50 rounded-lg border border-gray-100 flex items-start gap-3">
               <Clock size={22} className="text-red flex-shrink-0 mt-0.5" />
               <div>
                 <strong className="block text-gray-900 font-semibold text-sm">Réactivité d'intervention</strong>
-                <span className="text-xs text-gray-500">Déplacement rapide pour diagnostics d’infiltrations, sécurisation après tempête et dépannages urgents.</span>
+                <span className="text-xs text-gray-500">Déplacement rapide pour diagnostics d’infiltrations et dépannages d'urgence.</span>
               </div>
             </div>
             <div className="p-3 bg-gray-50 rounded-lg border border-gray-100 flex items-start gap-3">
               <Phone size={22} className="text-red flex-shrink-0 mt-0.5" />
               <div>
                 <strong className="block text-gray-900 font-semibold text-sm">Interlocuteur unique</strong>
-                <span className="text-xs text-gray-500">Accompagnement personnalisé par nos maîtres couvreurs du devis jusqu’à la réception du chantier.</span>
+                <span className="text-xs text-gray-500">Accompagnement personnalisé par nos maîtres couvreurs jusqu’à la livraison du chantier.</span>
               </div>
             </div>
           </div>
@@ -243,11 +285,11 @@ export function App() {
               type="button"
               onClick={() => {
                 setIsAboutModalOpen(false)
-                handleNavigate('devis')
+                setIsQuoteModalOpen(true)
               }}
-              className="btn btn-primary"
+              className="btn btn-primary w-full-mobile"
             >
-              <span>Contacter l'équipe ADP Toiture</span>
+              <span>Demander un devis à l'équipe</span>
               <ArrowRight size={16} />
             </button>
           </div>

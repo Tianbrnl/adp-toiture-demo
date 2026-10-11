@@ -5,17 +5,14 @@ export function Logo({ light = false, className = '' }) {
   const subColor = light ? '#E2E8F0' : '#22252A'
 
   return (
-    <div className={`logo-container inline-flex items-center gap-2 cursor-pointer select-none ${className}`}>
+    <div className={`logo-container inline-flex items-center select-none ${className}`}>
       <div className="flex flex-col items-center">
         {/* Main "adp" lettering */}
         <div className="flex items-baseline tracking-tight font-extrabold leading-none">
           <span 
+            className="logo-main-text"
             style={{ 
               color: textColor,
-              fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-              fontSize: '34px',
-              fontWeight: 900,
-              letterSpacing: '-2px',
               lineHeight: 0.85
             }}
           >
@@ -24,19 +21,16 @@ export function Logo({ light = false, className = '' }) {
         </div>
         
         {/* Subtitle "TOITURE SA" with red roof chevron accents */}
-        <div className="flex items-center gap-1.5 mt-1">
+        <div className="logo-sub-wrapper flex items-center mt-1">
           {/* Left red roof angle */}
-          <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+          <svg className="logo-chevron" width="10" height="7" viewBox="0 0 10 7" fill="none">
             <path d="M9 6L2 3.5L9 1" stroke="#E52320" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
           
           <span 
+            className="logo-sub-text"
             style={{ 
               color: subColor,
-              fontFamily: "'Inter', sans-serif",
-              fontSize: '9px',
-              fontWeight: 800,
-              letterSpacing: '1.8px',
               textTransform: 'uppercase'
             }}
           >
@@ -44,7 +38,7 @@ export function Logo({ light = false, className = '' }) {
           </span>
 
           {/* Right red roof angle */}
-          <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+          <svg className="logo-chevron" width="10" height="7" viewBox="0 0 10 7" fill="none">
             <path d="M1 6L8 3.5L1 1" stroke="#E52320" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
